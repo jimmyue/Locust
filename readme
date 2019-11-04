@@ -1,0 +1,16 @@
+【执行测试】
+locust -f locustfile.py
+
+【调试模式】
+locust -f locustfile.py --no_web -c 1 -n 1
+
+【分布式】
+#设置主服务
+locust -f test.py --master --port=8088
+#设置从服务，与master同一台机
+locust -f test.py --slave 
+#设置从服务，与master非同一台机
+locust -f test.py --slave --master-host=<locust_machine_ip>
+
+【CSV结果】
+locust -f test.py --csv=example --no-web -t10m
