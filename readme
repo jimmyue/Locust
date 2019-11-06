@@ -2,7 +2,7 @@
 locust -f locustfile.py
 
 【调试模式】
-locust -f locustfile.py --no_web -c 1 -n 1
+locust -f locustfile.py --no-web -c 1 -r 1
 
 【分布式】
 #设置主服务
