@@ -34,9 +34,9 @@ def line_smooth(TIME,CPU,Memory,Disk,n,delay) -> Line:
 		.add_yaxis("Disk", Disk, is_smooth=True)
 		.set_global_opts(title_opts=opts.TitleOpts(title="资源利用率(%)",subtitle="采集次数：%s  采集频率：%ss/次" % (n,delay))
 			,toolbox_opts=opts.ToolboxOpts(is_show=True)
-			,datazoom_opts=opts.DataZoomOpts(is_show=True,range_start=60,range_end=100))
+			,datazoom_opts=opts.DataZoomOpts(is_show=True,range_start=100*(n-11)/n,range_end=100))
 	)
-	print('成功生成折线图')
+	print('可视化图表生成完成')
 	return c
 
 if __name__ == "__main__":
