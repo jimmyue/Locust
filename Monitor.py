@@ -1,25 +1,50 @@
 import psutil
 import time
-import numpy as np
-import matplotlib.pyplot as plt
+import pyecharts.options as opts
+from pyecharts.charts import Line
 
-x = np.linspace(0, 10, 500)
-y = np.sin(x)
-fig, ax = plt.subplots()
-# Using set_dashes() to modify dashing of an existing line
-line1, = ax.plot(x, y, label='Using set_dashes()')
-line1.set_dashes([2, 2, 10, 2])  # 2pt line, 2pt break, 10pt line, 2pt break
-# Using plot(..., dashes=...) to set the dashing when creating a line
-line2, = ax.plot(x, y - 0.2, dashes=[6, 2], label='Using the dashes parameter')
-ax.legend()
-plt.show()
+def line_data(n,delay):
+	'''
+	生成性能指标数据：
+	n代表生成的次数
+	delay代表每隔多少秒采集一次
+	'''
+	TIME=[]
+	CPU=[]
+	Memory=[]
+	Disk=[]
+	for i in range(n):
+		time.sleep(delay)
+		print('正在采集第%s条数据' % str(i+1))
+		TIME.append(time.strftime("%H:%M:%S", time.localtime()))
+		CPU.append(psutil.cpu_percent())
+		Memory.append(psutil.virtual_memory().percent)
+		Disk.append(psutil.disk_usage('c:').percent)
+	return TIME,CPU,Memory,Disk,n,delay
 
-#print(psutil.test())
-# delay=3
-# print('CPU使用率  内存使用率  C盘使用率')
-# while True:
-# 	time.sleep(delay)
-# 	print(' '+str(psutil.cpu_percent())+'%       '\
-# 		+str(psutil.virtual_memory().percent)+'%      '\
-# 		+str(psutil.disk_usage('c:').percent)+'%')
+def line_smooth(TIME,CPU,Memory,Disk,n,delay) -> Line:
+	'''
+	设置可视化图标格式，生成echarts折线图
+	'''
+	c = (
+		Line()
+		.add_xaxis(TIME)
+		.add_yaxis("CPU", CPU, is_smooth=True)
+		.add_yaxis("Memory", Memory, is_smooth=True)
+		.add_yaxis("Disk", Disk, is_smooth=True)
+		.set_global_opts(title_opts=opts.TitleOpts(title="资源利用率(%)",subtitle="采集次数：%s  采集频率：%ss/次" % (n,delay))
+			,toolbox_opts=opts.ToolboxOpts(is_show=True)
+			,datazoom_opts=opts.DataZoomOpts(is_show=True,range_start=60,range_end=100))
+	)
+	print('成功生成折线图')
+	return c
+
+if __name__ == "__main__":
+	temp_data=line_data(30,1)
+	file_name='Performance_'+time.strftime("%Y%m%d", time.localtime())+'.html'
+	line_smooth(temp_data[0],temp_data[1],temp_data[2],temp_data[3],temp_data[4],temp_data[5]).render(file_name)
+
+
+
+
 
