@@ -14,5 +14,14 @@ locust -f test.py --slave
 #设置从服务，与master非同一台机
 locust -f test.py --slave --master-host=<locust_machine_ip>
 
+【docker上分布式locust】
+https://docs.locust.io/en/stable/running-locust-docker.html#running-your-tests
+#单独运行： /locustfile为本地test.py对应文件夹路径,test.py为locust脚本,TARGET_URL为压测网站地址,locustio/locust为docker镜像;
+docker run -p 18089:8089 --volume /locustfile:/mnt/locust -e LOCUSTFILE_PATH=/mnt/locust/test.py -e TARGET_URL=IP locustio/locust
+#主从模式-master： 端口18089为locust访问端口,端口5557、5558为主从默认通信端口;
+docker run -p 18089:8089 -p 5557:5557 -p 5558:5558 --volume /locustfile:/mnt/locust -e LOCUSTFILE_PATH=/mnt/locust/test.py -e TARGET_URL=IP -e LOCUST_MODE=master --name master locustio/locust
+#主从模式-slave：  修改本机映射对应端口不一致即可,可以多个slave,LOCUST_MASTER_HOST为测试机对应地址;
+docker run -p 18090:8089 --volume /locustfile:/mnt/locust -e LOCUSTFILE_PATH=/mnt/locust/test.py -e TARGET_URL=IP -e LOCUST_MODE=slave -e LOCUST_MASTER_HOST=IP locustio/locust
+
 【CSV结果】
 locust -f test.py --csv=example --no-web -t10m
